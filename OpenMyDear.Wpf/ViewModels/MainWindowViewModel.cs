@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -286,6 +287,66 @@ public partial class MainWindowViewModel : ObservableObject
         TriggerAutoSave();
     }
 
+    [RelayCommand(CanExecute = nameof(HasSelectedItem))]
+    private void PickSelectedItemAsApp()
+    {
+        if (SelectedItem is null)
+        {
+            return;
+        }
+
+        var initialDirectory = ResolveInitialDirectory(SelectedItem.Path);
+        var path = _folderPickerService.PickExecutable(initialDirectory);
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
+        SelectedItem.Path = path;
+        SelectedItem.Type = ItemType.App;
+        TriggerAutoSave();
+    }
+
+    [RelayCommand(CanExecute = nameof(HasSelectedItem))]
+    private void PickSelectedItemAsFile()
+    {
+        if (SelectedItem is null)
+        {
+            return;
+        }
+
+        var initialDirectory = ResolveInitialDirectory(SelectedItem.Path);
+        var path = _folderPickerService.PickFile(initialDirectory);
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
+        SelectedItem.Path = path;
+        SelectedItem.Type = ItemType.File;
+        TriggerAutoSave();
+    }
+
+    [RelayCommand(CanExecute = nameof(HasSelectedItem))]
+    private void PickSelectedItemAsFolder()
+    {
+        if (SelectedItem is null)
+        {
+            return;
+        }
+
+        var initialDirectory = ResolveInitialDirectory(SelectedItem.Path);
+        var path = _folderPickerService.PickFolder(initialDirectory);
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
+        SelectedItem.Path = path;
+        SelectedItem.Type = ItemType.Folder;
+        TriggerAutoSave();
+    }
+
     [RelayCommand(CanExecute = nameof(HasSelectedProfile))]
     private async Task RunProfileAsync()
     {
@@ -502,6 +563,9 @@ public partial class MainWindowViewModel : ObservableObject
         RemoveItemCommand.NotifyCanExecuteChanged();
         PickOpenWithCommand.NotifyCanExecuteChanged();
         ClearOpenWithCommand.NotifyCanExecuteChanged();
+        PickSelectedItemAsAppCommand.NotifyCanExecuteChanged();
+        PickSelectedItemAsFileCommand.NotifyCanExecuteChanged();
+        PickSelectedItemAsFolderCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnAlwaysOnTopChanged(bool value)
@@ -599,5 +663,33 @@ public partial class MainWindowViewModel : ObservableObject
         _config.Theme = _themeService.CurrentTheme;
         SelectedTheme = _themeService.CurrentTheme;
         await SaveConfigAsync();
+    }
+
+    private static string? ResolveInitialDirectory(string? currentPath)
+    {
+        if (string.IsNullOrWhiteSpace(currentPath))
+        {
+            return null;
+        }
+
+        try
+        {
+            if (Directory.Exists(currentPath))
+            {
+                return currentPath;
+            }
+
+            if (File.Exists(currentPath))
+            {
+                return Path.GetDirectoryName(currentPath);
+            }
+
+            var directory = Path.GetDirectoryName(currentPath);
+            return string.IsNullOrWhiteSpace(directory) ? null : directory;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }
