@@ -1,0 +1,12 @@
+namespace OpenMyDear.Wpf.Models;
+
+public sealed class LaunchItemModel
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+
+    public string Label { get; set; } = "New Item";
+
+    public string Path { get; set; } = string.Empty;
+
+    public ItemType Type { get; set; } = ItemType.App;
+}
