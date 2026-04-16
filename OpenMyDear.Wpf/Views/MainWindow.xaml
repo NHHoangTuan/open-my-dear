@@ -6,215 +6,436 @@
         mc:Ignorable="d"
         Title="OpenMyDear.Wpf"
         Topmost="{Binding AlwaysOnTop, Mode=TwoWay}"
-        Height="760"
-        Width="1220"
-        MinHeight="640"
-        MinWidth="980">
-    <Grid Margin="12">
+        Height="780"
+        Width="1240"
+        MinHeight="680"
+        MinWidth="1040"
+        KeyboardNavigation.TabNavigation="Cycle">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
+    <Grid Margin="16" Background="{DynamicResource Brush.Background}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="280" />
-            <ColumnDefinition Width="12" />
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="16" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" BorderBrush="#DDD" BorderThickness="1" Padding="10">
-            <DockPanel>
-                <TextBlock DockPanel.Dock="Top"
-                           FontWeight="SemiBold"
-                           FontSize="16"
-                           Margin="0,0,0,10"
-                           Text="{Binding Localizer[Profiles]}" />
+        <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,10,0,0">
-                    <Button Content="{Binding Localizer[Add]}" Width="80" Margin="0,0,8,0" Command="{Binding AddProfileCommand}" />
-                    <Button Content="{Binding Localizer[Delete]}" Width="80" Command="{Binding RemoveProfileCommand}" />
+                <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                    <TextBlock Text="OpenMyDear" Style="{StaticResource TitleTextStyle}" />
+                    <TextBlock Text="{Binding Localizer[Profiles]}"
+                               Style="{StaticResource CaptionTextStyle}"
+                               Margin="0,4,0,0" />
                 </StackPanel>
 
-                <ListBox ItemsSource="{Binding Profiles}"
-                         SelectedItem="{Binding SelectedProfile}"
-                         DisplayMemberPath="Name" />
-            </DockPanel>
+                <Separator Grid.Row="1" />
+
+                <ListBox Grid.Row="2"
+                         Margin="0,12,0,12"
+                         ItemsSource="{Binding Profiles}"
+                         SelectedItem="{Binding SelectedProfile}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="12"
+                                    CornerRadius="10"
+                                    Background="{DynamicResource Brush.SurfaceAlt}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="26" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                               VerticalAlignment="Center"
+                                               FontFamily="Segoe MDL2 Assets"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource Brush.TextSecondary}"
+                                               Text="&#xE8B7;" />
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{Binding Name}"
+                                                   Style="{StaticResource BodyTextStyle}"
+                                                   FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding Items.Count, StringFormat={}{0} items}"
+                                                   Style="{StaticResource CaptionTextStyle}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Row="3" Orientation="Horizontal">
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                            Width="92"
+                            Margin="0,0,8,0"
+                            Content="{Binding Localizer[Add]}"
+                            Command="{Binding AddProfileCommand}" />
+                    <Button Style="{StaticResource DangerButtonStyle}"
+                            Width="92"
+                            Content="{Binding Localizer[Delete]}"
+                            Command="{Binding RemoveProfileCommand}" />
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <Grid Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" Padding="0 0 15 0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-            <GroupBox Header="{Binding Localizer[Settings]}" Grid.Row="0" Padding="10" Margin="0,0,0,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="170" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                    <Grid>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="{Binding Localizer[RunAtStartup]}" />
-                    <CheckBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,8" IsChecked="{Binding AutostartEnabled, Mode=TwoWay}" />
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="{Binding Localizer[AlwaysOnTop]}" />
-                    <CheckBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,8" IsChecked="{Binding AlwaysOnTop, Mode=TwoWay}" />
+                        <TextBlock Text="{Binding Localizer[Profile]}" Style="{StaticResource SectionHeaderTextStyle}" 
+                                   Grid.Row="0"/>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="{Binding Localizer[Language]}" />
-                    <ComboBox Grid.Row="2"
-                              Grid.Column="1"
-                              Margin="0,0,0,8"
-                              Width="150"
-                              SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
-                              ItemsSource="{Binding SupportedLanguages}" />
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="170" />
+                            </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0" Text="{Binding Localizer[StorageDirectory]}" />
-                    <TextBox Grid.Row="3"
-                             Grid.Column="1"
-                             Margin="0,0,8,0"
-                             IsReadOnly="True"
-                             Text="{Binding StorageDirectory}" />
-                    <Button Grid.Row="3"
-                            Grid.Column="2"
-                            Margin="0,0,8,0"
-                            Width="90"
-                            Content="{Binding Localizer[Browse]}"
-                            Command="{Binding BrowseStorageDirectoryCommand}" />
-                    <Button Grid.Row="3"
-                            Grid.Column="3"
-                            Width="90"
-                            Content="{Binding Localizer[Clear]}"
-                            Command="{Binding ClearStorageDirectoryCommand}" />
-                </Grid>
-            </GroupBox>
+                            <StackPanel Grid.Column="0" Margin="0,0,12,0" VerticalAlignment="Center">
 
-            <GroupBox Header="{Binding Localizer[Profile]}" Grid.Row="1" Padding="10" Margin="0,0,0,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="170" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                                <TextBlock Text="{Binding Localizer[Name]}" Style="{StaticResource CaptionTextStyle}" Margin="0,0,0,4" />
+                                <TextBox Text="{Binding SelectedProfile.Name, UpdateSourceTrigger=PropertyChanged}"
+             IsEnabled="{Binding HasSelectedProfile}" />
+                            </StackPanel>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="{Binding Localizer[Name]}" />
-                    <TextBox Grid.Row="0"
-                             Grid.Column="1"
-                             Margin="0,0,0,8"
-                             IsEnabled="{Binding HasSelectedProfile}"
-                             Text="{Binding SelectedProfile.Name, UpdateSourceTrigger=PropertyChanged}" />
+                            <StackPanel Grid.Column="1" Margin="0,0,12,0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Localizer[LaunchMode]}" Style="{StaticResource CaptionTextStyle}" Margin="0,0,0,4" />
+                                <ComboBox ItemsSource="{Binding LaunchModes}"
+              SelectedItem="{Binding SelectedProfile.LaunchMode, UpdateSourceTrigger=PropertyChanged}"
+              IsEnabled="{Binding HasSelectedProfile}" />
+                            </StackPanel>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="{Binding Localizer[LaunchMode]}" />
-                    <ComboBox Grid.Row="1"
-                              Grid.Column="1"
-                              Margin="0,0,0,8"
-                              IsEnabled="{Binding HasSelectedProfile}"
-                              ItemsSource="{Binding LaunchModes}"
-                              SelectedItem="{Binding SelectedProfile.LaunchMode, UpdateSourceTrigger=PropertyChanged}" />
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Localizer[DelaySeconds]}" Style="{StaticResource CaptionTextStyle}" Margin="0,0,0,4" />
+                                <TextBox Text="{Binding SelectedProfile.DelaySeconds, UpdateSourceTrigger=PropertyChanged}"
+             IsEnabled="{Binding HasSelectedProfile}" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Localizer[DelaySeconds]}" />
-                    <TextBox Grid.Row="2"
-                             Grid.Column="1"
-                             IsEnabled="{Binding HasSelectedProfile}"
-                             Text="{Binding SelectedProfile.DelaySeconds, UpdateSourceTrigger=PropertyChanged}" />
-                </Grid>
-            </GroupBox>
+                <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Left" Text="{Binding Localizer[Items]}" Style="{StaticResource SectionHeaderTextStyle}" VerticalAlignment="Center" 
+                                   Margin="0 0 10 0"/>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button Style="{StaticResource SecondaryButtonStyle}"
+                                    Margin="0,0,8,0"
+                                    Content="{Binding Localizer[AddItem]}"
+                                    Command="{Binding AddItemCommand}" />
+                            <Button Style="{StaticResource DangerButtonStyle}"
+                                    Margin="0,0,8,0"
+                                    Content="{Binding Localizer[RemoveItem]}"
+                                    Command="{Binding RemoveItemCommand}" />
+                            <Button Style="{StaticResource PrimaryButtonStyle}"
+                                    MinWidth="140"
+                                    Content="{Binding Localizer[Run]}"
+                                    Command="{Binding RunProfileCommand}" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
 
-            <GroupBox Header="{Binding Localizer[Items]}" Grid.Row="2" Padding="10" Margin="0,0,0,10">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                    <DataGrid Grid.Row="0"
-                              ItemsSource="{Binding SelectedProfile.Items}"
-                              SelectedItem="{Binding SelectedItem}"
-                              AutoGenerateColumns="False"
-                              IsReadOnly="False"
-                              CanUserAddRows="False"
-                              CanUserDeleteRows="False"
-                              Margin="0,0,0,10"
-                              IsEnabled="{Binding HasSelectedProfile}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="{Binding Localizer[Label]}"
-                                                Width="180"
-                                                Binding="{Binding Label, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTextColumn Header="{Binding Localizer[Path]}"
-                                                Width="*"
-                                                Binding="{Binding Path, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTemplateColumn Header="{Binding Localizer[Type]}" Width="140">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ComboBox ItemsSource="{Binding DataContext.ItemTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                  SelectedItem="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  MinWidth="120" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                        <ListBox Grid.Row="0"
+                                 ItemsSource="{Binding SelectedProfile.Items}"
+                                 SelectedItem="{Binding SelectedItem}"
+                                 IsEnabled="{Binding HasSelectedProfile}"
+                                 Margin="0,0,0,10">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="10"
+                                            CornerRadius="10"
+                                            BorderBrush="{DynamicResource Brush.Border}"
+                                            BorderThickness="1"
+                                            Background="{DynamicResource Brush.SurfaceAlt}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="36" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
 
-                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                                            <Border Grid.Column="0"
+                                                    Width="28"
+                                                    Height="28"
+                                                    CornerRadius="14"
+                                                    Background="{DynamicResource Brush.Surface}">
+                                                <TextBlock HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           FontFamily="Segoe MDL2 Assets"
+                                                           Foreground="{DynamicResource Brush.TextSecondary}">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="&#xE8B7;" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Type}" Value="App">
+                                                                    <Setter Property="Text" Value="&#xE7AD;" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Type}" Value="File">
+                                                                    <Setter Property="Text" Value="&#xE8A5;" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                                                    <Setter Property="Text" Value="&#xE8B7;" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Border>
+
+                                            <StackPanel Grid.Column="1" Margin="10,0,10,0">
+                                                <TextBox Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"
+                                                         Background="Transparent"
+                                                         BorderThickness="0"
+                                                         Padding="0"
+                                                         FontWeight="SemiBold"
+                                                         MinHeight="28" />
+                                                <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"
+                                                         Style="{x:Null}"
+                                                         Margin="0,2,0,0"
+                                                         Padding="0"
+                                                         BorderThickness="0"
+                                                         Background="Transparent"
+                                                         Foreground="{DynamicResource Brush.TextSecondary}" />
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
+                                                <Border CornerRadius="10" Padding="8,2">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="{DynamicResource Brush.BadgeApp}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Type}" Value="File">
+                                                                    <Setter Property="Background" Value="{DynamicResource Brush.BadgeFile}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                                                    <Setter Property="Background" Value="{DynamicResource Brush.BadgeFolder}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <ComboBox Width="96"
+                                                              BorderThickness="0"
+                                                              Background="Transparent"
+                                                              ItemsSource="{Binding DataContext.ItemTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                              SelectedItem="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                </Border>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Button Style="{StaticResource GhostButtonStyle}"
+                                                        MinWidth="70"
+                                                        Margin="0,0,6,0"
+                                                    Content="{Binding DataContext.Localizer[Edit], RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        Command="{Binding DataContext.EditItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}" />
+                                                <Button Style="{StaticResource DangerButtonStyle}"
+                                                        MinWidth="78"
+                                                    Content="{Binding DataContext.Localizer[Delete], RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        Command="{Binding DataContext.RemoveItemByReferenceCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Separator Grid.Row="1" />
+
+                        <Grid Grid.Row="2" Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                <TextBlock Text="{Binding Localizer[OpenWithPath]}" Style="{StaticResource CaptionTextStyle}" />
+                                <TextBlock Text="{Binding Localizer[OpenWithHelper]}"
+                                           Style="{StaticResource CaptionTextStyle}"
+                                           Margin="0,2,0,0" />
+                            </StackPanel>
+
+                            <TextBox Grid.Column="1"
+                                     Margin="0,0,8,0"
+                                     IsEnabled="{Binding HasSelectedItem}"
+                                     Text="{Binding SelectedItem.OpenWith, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Grid.Column="2"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Margin="0,0,8,0"
+                                    IsEnabled="{Binding HasSelectedItem}"
+                                    Content="{Binding Localizer[PickApp]}"
+                                    Command="{Binding PickOpenWithCommand}" />
+                            <Button Grid.Column="3"
+                                    Style="{StaticResource GhostButtonStyle}"
+                                    IsEnabled="{Binding HasSelectedItem}"
+                                    Content="{Binding Localizer[Clear]}"
+                                    Command="{Binding ClearOpenWithCommand}" />
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="3" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="190" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="110" />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0" Text="{Binding Localizer[OpenWithPath]}" />
-                        <TextBox Grid.Column="1"
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Localizer[Settings]}" Style="{StaticResource SectionHeaderTextStyle}" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,12,8,8" Text="{Binding Localizer[RunAtStartup]}" VerticalAlignment="Center" />
+                        <CheckBox Grid.Row="1" Grid.Column="1" Margin="0,12,0,8" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding AutostartEnabled, Mode=TwoWay}" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="2" Margin="8,12,8,8" Text="{Binding Localizer[AlwaysOnTop]}" VerticalAlignment="Center" />
+                        <CheckBox Grid.Row="1" Grid.Column="3" Margin="0,12,0,8" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding AlwaysOnTop, Mode=TwoWay}" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,4,8,8" Text="{Binding Localizer[Language]}" VerticalAlignment="Center" />
+                        <ComboBox Grid.Row="2"
+                                  Grid.Column="1"
+                                  Margin="0,4,8,8"
+                                  Width="160"
+                                  SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                                  ItemsSource="{Binding SupportedLanguages}" />
+
+                        <!--<TextBlock Grid.Row="2" Grid.Column="2" Margin="8,4,8,8" Text="{Binding Localizer[Theme]}" VerticalAlignment="Center" />
+                        <ComboBox Grid.Row="2"
+                                  Grid.Column="3"
+                                  Margin="0,4,0,8"
+                                  Width="100"
+                                  SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
+                                  ItemsSource="{Binding SupportedThemes}" />-->
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,8,0" Text="{Binding Localizer[StorageDirectory]}" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="3"
+                                 Grid.Column="1"
+                                 Grid.ColumnSpan="2"
                                  Margin="0,0,8,0"
-                                 IsEnabled="{Binding HasSelectedItem}"
-                                 Text="{Binding SelectedItem.OpenWith, UpdateSourceTrigger=PropertyChanged}" />
-                        <Button Grid.Column="2"
-                                Width="90"
-                                Margin="0,0,8,0"
-                                IsEnabled="{Binding HasSelectedItem}"
-                                Content="{Binding Localizer[PickApp]}"
-                                Command="{Binding PickOpenWithCommand}" />
-                        <Button Grid.Column="3"
-                                Width="90"
-                                IsEnabled="{Binding HasSelectedItem}"
-                                Content="{Binding Localizer[Clear]}"
-                                Command="{Binding ClearOpenWithCommand}" />
+                                 IsReadOnly="True"
+                                 Text="{Binding StorageDirectory}" />
+                        <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Horizontal">
+                            <Button Style="{StaticResource SecondaryButtonStyle}"
+                                    Width="72"
+                                    Margin="0,0,8,0"
+                                    Content="{Binding Localizer[Browse]}"
+                                    Command="{Binding BrowseStorageDirectoryCommand}" />
+                            <Button Style="{StaticResource GhostButtonStyle}"
+                                    Width="64"
+                                    Content="{Binding Localizer[Clear]}"
+                                    Command="{Binding ClearStorageDirectoryCommand}" />
+                        </StackPanel>
                     </Grid>
+                </Border>
 
-                    <StackPanel Grid.Row="2" Orientation="Horizontal">
-                        <Button Content="{Binding Localizer[AddItem]}" Width="100" Margin="0,0,8,0" Command="{Binding AddItemCommand}" />
-                        <Button Content="{Binding Localizer[RemoveItem]}" Width="110" Command="{Binding RemoveItemCommand}" />
-                    </StackPanel>
-                </Grid>
-            </GroupBox>
+                <Border Grid.Row="4" Style="{StaticResource CardBorderStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,10">
-                <Button Content="{Binding Localizer[Run]}"
-                        Width="120"
-                        Height="32"
-                        Command="{Binding RunProfileCommand}" />
-            </StackPanel>
+                        <DockPanel Grid.Row="0">
+                            <TextBlock DockPanel.Dock="Left" Text="{Binding Localizer[RunResult]}" Style="{StaticResource SectionHeaderTextStyle}" 
+                                       Margin="0 0 10 0"/>
+                            <TextBlock DockPanel.Dock="Right"
+                                       Text="{Binding RunStatus}"
+                                       Style="{StaticResource CaptionTextStyle}"
+                                       VerticalAlignment="Center" />
+                        </DockPanel>
 
-            <GroupBox Grid.Row="4" Header="{Binding Localizer[RunResult]}" Padding="10">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Top"
-                               Text="{Binding RunStatus}"
-                               TextWrapping="Wrap"
-                               FontWeight="SemiBold"
-                               Margin="0,0,0,8" />
-                    <ListBox ItemsSource="{Binding RunErrors}" MinHeight="100" />
-                </DockPanel>
-            </GroupBox>
-        </Grid>
+                        <ProgressBar Grid.Row="1"
+                                     Margin="0,12,0,10"
+                                     IsIndeterminate="True"
+                                     Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                        <Grid Grid.Row="2" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="6" Padding="10" Margin="0,0,8,0">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Localizer[Total]}" Style="{StaticResource CaptionTextStyle}" />
+                                    <TextBlock Text="{Binding RunTotal}" Style="{StaticResource SectionHeaderTextStyle}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="1" Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="6" Padding="10" Margin="0,0,8,0">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Localizer[Success]}" Style="{StaticResource CaptionTextStyle}" />
+                                    <TextBlock Text="{Binding RunSucceeded}" Foreground="{DynamicResource Brush.Success}" Style="{StaticResource SectionHeaderTextStyle}" />
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="2" Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="6" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Localizer[Failed]}" Style="{StaticResource CaptionTextStyle}" />
+                                    <TextBlock Text="{Binding RunFailed}" Foreground="{DynamicResource Brush.Error}" Style="{StaticResource SectionHeaderTextStyle}" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <Border Grid.Row="3" Background="{DynamicResource Brush.SurfaceAlt}" CornerRadius="6" Padding="10">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding Localizer[LatestIssue]}" Style="{StaticResource CaptionTextStyle}" Margin="0,0,0,6" />
+                                <TextBlock DockPanel.Dock="Top"
+                                           Text="{Binding LatestRunIssue}"
+                                           TextWrapping="Wrap"
+                                           Foreground="{DynamicResource Brush.TextSecondary}"
+                                           Margin="0,0,0,8" />
+                                <ListBox ItemsSource="{Binding RunErrors}" MaxHeight="120" />
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
     </Grid>
 </Window>

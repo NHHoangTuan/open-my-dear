@@ -9,4 +9,6 @@ public sealed class AppConfigModel
     public bool AutostartEnabled { get; set; }
 
     public string Language { get; set; } = "en";
+
+    public string Theme { get; set; } = "system";
 }

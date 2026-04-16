@@ -12,6 +12,7 @@ public partial class App : System.Windows.Application
         base.OnStartup(e);
 
         var localizationService = new JsonLocalizationService();
+        var themeService = new ThemeService();
         var storageService = new JsonProfileStorageService();
         var configService = new JsonConfigService();
         var migrationService = new ProfileMigrationService();
@@ -30,7 +31,8 @@ public partial class App : System.Windows.Application
             installedAppDiscoveryService,
             appPickerDialogService,
             folderPickerService,
-            localizationService);
+            localizationService,
+            themeService);
 
         await mainWindowViewModel.InitializeAsync();
 

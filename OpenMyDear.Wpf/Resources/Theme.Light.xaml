@@ -1,0 +1,77 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <Color x:Key="Color.Background">#FFF6F8FB</Color>
+    <Color x:Key="Color.Surface">#FFFFFFFF</Color>
+    <Color x:Key="Color.SurfaceAlt">#FFF0F3F8</Color>
+    <Color x:Key="Color.TextPrimary">#FF1F2937</Color>
+    <Color x:Key="Color.TextSecondary">#FF5B6678</Color>
+    <Color x:Key="Color.Accent">#FF2563EB</Color>
+    <Color x:Key="Color.Success">#FF14804A</Color>
+    <Color x:Key="Color.Warning">#FFB36B00</Color>
+    <Color x:Key="Color.Error">#FFC0392B</Color>
+    <Color x:Key="Color.Border">#FFD7DDE8</Color>
+    <Color x:Key="Color.Divider">#FFE3E8F1</Color>
+    <Color x:Key="Color.Focus">#882563EB</Color>
+
+    <SolidColorBrush x:Key="Brush.Background" Color="{StaticResource Color.Background}" />
+    <SolidColorBrush x:Key="Brush.Surface" Color="{StaticResource Color.Surface}" />
+    <SolidColorBrush x:Key="Brush.SurfaceAlt" Color="{StaticResource Color.SurfaceAlt}" />
+    <SolidColorBrush x:Key="Brush.TextPrimary" Color="{StaticResource Color.TextPrimary}" />
+    <SolidColorBrush x:Key="Brush.TextSecondary" Color="{StaticResource Color.TextSecondary}" />
+    <SolidColorBrush x:Key="Brush.Accent" Color="{StaticResource Color.Accent}" />
+    <SolidColorBrush x:Key="Brush.Success" Color="{StaticResource Color.Success}" />
+    <SolidColorBrush x:Key="Brush.Warning" Color="{StaticResource Color.Warning}" />
+    <SolidColorBrush x:Key="Brush.Error" Color="{StaticResource Color.Error}" />
+    <SolidColorBrush x:Key="Brush.Border" Color="{StaticResource Color.Border}" />
+    <SolidColorBrush x:Key="Brush.Divider" Color="{StaticResource Color.Divider}" />
+    <SolidColorBrush x:Key="Brush.Focus" Color="{StaticResource Color.Focus}" />
+
+    <SolidColorBrush x:Key="Brush.ButtonPrimaryForeground" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="Brush.ButtonPrimaryBackground" Color="#FF2563EB" />
+    <SolidColorBrush x:Key="Brush.ButtonPrimaryHover" Color="#FF1E53CB" />
+    <SolidColorBrush x:Key="Brush.ButtonPrimaryPressed" Color="#FF1645AF" />
+
+    <SolidColorBrush x:Key="Brush.ButtonSecondaryForeground" Color="{StaticResource Color.TextPrimary}" />
+    <SolidColorBrush x:Key="Brush.ButtonSecondaryBackground" Color="#FFF2F5FB" />
+    <SolidColorBrush x:Key="Brush.ButtonSecondaryHover" Color="#FFE6ECF7" />
+    <SolidColorBrush x:Key="Brush.ButtonSecondaryPressed" Color="#FFDDE5F4" />
+
+    <SolidColorBrush x:Key="Brush.ButtonGhostForeground" Color="{StaticResource Color.TextPrimary}" />
+    <SolidColorBrush x:Key="Brush.ButtonGhostBackground" Color="#00FFFFFF" />
+    <SolidColorBrush x:Key="Brush.ButtonGhostHover" Color="#12000000" />
+    <SolidColorBrush x:Key="Brush.ButtonGhostPressed" Color="#1E000000" />
+
+    <SolidColorBrush x:Key="Brush.ButtonDangerForeground" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="Brush.ButtonDangerBackground" Color="#FFC0392B" />
+    <SolidColorBrush x:Key="Brush.ButtonDangerHover" Color="#FFAA2E21" />
+    <SolidColorBrush x:Key="Brush.ButtonDangerPressed" Color="#FF8E2217" />
+
+    <SolidColorBrush x:Key="Brush.InputBackground" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="Brush.InputBorder" Color="#FFC8D1E2" />
+    <SolidColorBrush x:Key="Brush.InputHoverBorder" Color="#FF97A8C8" />
+
+    <SolidColorBrush x:Key="Brush.ListItemSelected" Color="#1A2563EB" />
+    <SolidColorBrush x:Key="Brush.ListItemHover" Color="#0E000000" />
+
+    <SolidColorBrush x:Key="Brush.BadgeApp" Color="#FFDBE9FF" />
+    <SolidColorBrush x:Key="Brush.BadgeFile" Color="#FFE8F8E8" />
+    <SolidColorBrush x:Key="Brush.BadgeFolder" Color="#FFFFF2D6" />
+
+    <sys:Double x:Key="Spacing.4">4</sys:Double>
+    <sys:Double x:Key="Spacing.8">8</sys:Double>
+    <sys:Double x:Key="Spacing.12">12</sys:Double>
+    <sys:Double x:Key="Spacing.16">16</sys:Double>
+    <sys:Double x:Key="Spacing.20">20</sys:Double>
+    <sys:Double x:Key="Spacing.24">24</sys:Double>
+
+    <CornerRadius x:Key="Corner.6">6</CornerRadius>
+    <CornerRadius x:Key="Corner.10">10</CornerRadius>
+    <CornerRadius x:Key="Corner.14">14</CornerRadius>
+
+    <DropShadowEffect x:Key="Shadow.Card"
+                      BlurRadius="12"
+                      ShadowDepth="0"
+                      Opacity="0.14"
+                      Color="#300F172A" />
+</ResourceDictionary>

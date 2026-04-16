@@ -19,6 +19,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly IInstalledAppDiscoveryService _installedAppDiscoveryService;
     private readonly IAppPickerDialogService _appPickerDialogService;
     private readonly IFolderPickerService _folderPickerService;
+    private readonly IThemeService _themeService;
     private readonly SemaphoreSlim _saveProfilesSemaphore = new(1, 1);
     private readonly SemaphoreSlim _saveConfigSemaphore = new(1, 1);
 
@@ -50,6 +51,21 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private string _selectedLanguage = "en";
 
+    [ObservableProperty]
+    private string _selectedTheme = "system";
+
+    [ObservableProperty]
+    private int _runTotal;
+
+    [ObservableProperty]
+    private int _runSucceeded;
+
+    [ObservableProperty]
+    private int _runFailed;
+
+    [ObservableProperty]
+    private string _latestRunIssue = "-";
+
     public ObservableCollection<ProfileViewModel> Profiles { get; } = [];
 
     public ObservableCollection<string> RunErrors { get; } = [];
@@ -61,6 +77,8 @@ public partial class MainWindowViewModel : ObservableObject
     public ILocalizationService Localizer { get; }
 
     public string[] SupportedLanguages => Localizer.SupportedLanguages;
+
+    public string[] SupportedThemes => _themeService.SupportedThemes;
 
     public bool HasSelectedProfile => SelectedProfile is not null;
 
@@ -75,7 +93,8 @@ public partial class MainWindowViewModel : ObservableObject
         IInstalledAppDiscoveryService installedAppDiscoveryService,
         IAppPickerDialogService appPickerDialogService,
         IFolderPickerService folderPickerService,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        IThemeService themeService)
     {
         _profileStorageService = profileStorageService;
         _configService = configService;
@@ -85,6 +104,7 @@ public partial class MainWindowViewModel : ObservableObject
         _installedAppDiscoveryService = installedAppDiscoveryService;
         _appPickerDialogService = appPickerDialogService;
         _folderPickerService = folderPickerService;
+        _themeService = themeService;
         Localizer = localizationService;
 
         Profiles.CollectionChanged += OnProfilesCollectionChanged;
@@ -99,6 +119,10 @@ public partial class MainWindowViewModel : ObservableObject
             AlwaysOnTop = _config.AlwaysOnTop;
             AutostartEnabled = _config.AutostartEnabled;
             SelectedLanguage = string.IsNullOrWhiteSpace(_config.Language) ? "en" : _config.Language;
+            SelectedTheme = string.IsNullOrWhiteSpace(_config.Theme) ? "system" : _config.Theme;
+
+            _themeService.ApplyTheme(SelectedTheme);
+            SelectedTheme = _themeService.CurrentTheme;
 
             await Localizer.SetLanguageAsync(SelectedLanguage);
             SelectedLanguage = Localizer.CurrentLanguage;
@@ -184,6 +208,34 @@ public partial class MainWindowViewModel : ObservableObject
         TriggerAutoSave();
     }
 
+    [RelayCommand]
+    private void EditItem(LaunchItemViewModel? item)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
+        SelectedItem = item;
+    }
+
+    [RelayCommand]
+    private void RemoveItemByReference(LaunchItemViewModel? item)
+    {
+        if (SelectedProfile is null || item is null)
+        {
+            return;
+        }
+
+        SelectedProfile.Items.Remove(item);
+        if (ReferenceEquals(SelectedItem, item))
+        {
+            SelectedItem = SelectedProfile.Items.FirstOrDefault();
+        }
+
+        TriggerAutoSave();
+    }
+
     [RelayCommand(CanExecute = nameof(HasSelectedItem))]
     private async Task PickOpenWithAsync()
     {
@@ -247,8 +299,16 @@ public partial class MainWindowViewModel : ObservableObject
             IsBusy = true;
             RunErrors.Clear();
             RunStatus = Localizer["StatusRunningProfile"];
+            RunTotal = 0;
+            RunSucceeded = 0;
+            RunFailed = 0;
+            LatestRunIssue = "-";
 
             var result = await _launcherService.RunAsync(SelectedProfile.ToModel());
+            RunTotal = result.Total;
+            RunSucceeded = result.Succeeded;
+            RunFailed = result.Failed;
+
             foreach (var warning in result.Warnings)
             {
                 RunErrors.Add($"[{Localizer["RunWarning"]}] {warning}");
@@ -258,6 +318,8 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 RunErrors.Add($"[{Localizer["RunError"]}] {error}");
             }
+
+            LatestRunIssue = RunErrors.FirstOrDefault() ?? "-";
 
             RunStatus = string.Format(
                 Localizer["StatusRunCompleted"],
@@ -491,6 +553,22 @@ public partial class MainWindowViewModel : ObservableObject
         });
     }
 
+    partial void OnSelectedThemeChanged(string value)
+    {
+        if (!_isInitialized)
+        {
+            return;
+        }
+
+        UpdateTheme(value).SafeFireAndForget(ex =>
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                RunStatus = $"{Localizer["StatusConfigSaveFailed"]}: {ex.Message}";
+            });
+        });
+    }
+
     private async Task UpdateAutostartAsync(bool enabled)
     {
         var result = await _autostartService.SetEnabledAsync(enabled);
@@ -513,5 +591,13 @@ public partial class MainWindowViewModel : ObservableObject
         SelectedLanguage = Localizer.CurrentLanguage;
         await SaveConfigAsync();
         RunStatus = Localizer["StatusLanguageUpdated"];
+    }
+
+    private async Task UpdateTheme(string theme)
+    {
+        _themeService.ApplyTheme(theme);
+        _config.Theme = _themeService.CurrentTheme;
+        SelectedTheme = _themeService.CurrentTheme;
+        await SaveConfigAsync();
     }
 }
