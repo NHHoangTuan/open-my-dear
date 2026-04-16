@@ -153,10 +153,15 @@
                             <DataGridTextColumn Header="{Binding Localizer[Path]}"
                                                 Width="*"
                                                 Binding="{Binding Path, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridComboBoxColumn Header="{Binding Localizer[Type]}"
-                                                    Width="120"
-                                                    SelectedItemBinding="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
-                                                    ItemsSource="{Binding DataContext.ItemTypes, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            <DataGridTemplateColumn Header="{Binding Localizer[Type]}" Width="140">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding DataContext.ItemTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  SelectedItem="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  MinWidth="120" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 
