@@ -9,4 +9,6 @@ public sealed class ProfileRunResultModel
     public int Failed { get; set; }
 
     public List<RunErrorModel> Errors { get; set; } = [];
+
+    public List<string> Warnings { get; set; } = [];
 }

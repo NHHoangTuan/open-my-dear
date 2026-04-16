@@ -17,12 +17,24 @@ public partial class LaunchItemViewModel : ObservableObject
     [ObservableProperty]
     private ItemType _type;
 
+    [ObservableProperty]
+    private string? _openWith;
+
+    [ObservableProperty]
+    private string? _openWithName;
+
+    [ObservableProperty]
+    private string? _openWithIcon;
+
     public LaunchItemViewModel()
     {
         _id = Guid.NewGuid().ToString();
         _label = "New Item";
         _path = string.Empty;
         _type = ItemType.App;
+        _openWith = null;
+        _openWithName = null;
+        _openWithIcon = null;
     }
 
     public LaunchItemViewModel(LaunchItemModel model)
@@ -31,6 +43,9 @@ public partial class LaunchItemViewModel : ObservableObject
         _label = model.Label;
         _path = model.Path;
         _type = model.Type;
+        _openWith = model.OpenWith;
+        _openWithName = model.OpenWithName;
+        _openWithIcon = model.OpenWithIcon;
     }
 
     public LaunchItemModel ToModel()
@@ -40,7 +55,10 @@ public partial class LaunchItemViewModel : ObservableObject
             Id = Id,
             Label = Label,
             Path = Path,
-            Type = Type
+            Type = Type,
+            OpenWith = OpenWith,
+            OpenWithName = OpenWithName,
+            OpenWithIcon = OpenWithIcon
         };
     }
 }

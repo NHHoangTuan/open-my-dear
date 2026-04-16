@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.IO;
+using OpenMyDear.Wpf.Helpers;
 using OpenMyDear.Wpf.Models;
 
 namespace OpenMyDear.Wpf.Services;
@@ -10,31 +11,27 @@ public sealed class JsonProfileStorageService : IProfileStorageService
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         Converters =
         {
             new JsonStringEnumConverter()
         }
     };
 
-    private readonly string _filePath;
-
-    public JsonProfileStorageService()
+    public async Task<IReadOnlyList<ProfileModel>> LoadAsync(string? storageDirectory, CancellationToken cancellationToken = default)
     {
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var folder = Path.Combine(appData, "OpenMyDear.Wpf");
-        _filePath = Path.Combine(folder, "profiles.json");
-    }
+        var filePath = AppPaths.ResolveProfilesPath(storageDirectory);
 
-    public async Task<IReadOnlyList<ProfileModel>> LoadAsync(CancellationToken cancellationToken = default)
-    {
         try
         {
-            if (!File.Exists(_filePath))
+            if (!File.Exists(filePath))
             {
                 return [];
             }
 
-            await using var stream = File.OpenRead(_filePath);
+            await using var stream = File.OpenRead(filePath);
             var profiles = await JsonSerializer.DeserializeAsync<List<ProfileModel>>(stream, JsonOptions, cancellationToken);
             return profiles ?? [];
         }
@@ -44,9 +41,10 @@ public sealed class JsonProfileStorageService : IProfileStorageService
         }
     }
 
-    public async Task SaveAsync(IReadOnlyList<ProfileModel> profiles, CancellationToken cancellationToken = default)
+    public async Task SaveAsync(IReadOnlyList<ProfileModel> profiles, string? storageDirectory, CancellationToken cancellationToken = default)
     {
-        var directoryPath = Path.GetDirectoryName(_filePath);
+        var filePath = AppPaths.ResolveProfilesPath(storageDirectory);
+        var directoryPath = Path.GetDirectoryName(filePath);
         if (string.IsNullOrWhiteSpace(directoryPath))
         {
             throw new InvalidOperationException("Unable to determine profiles storage directory.");
@@ -54,7 +52,7 @@ public sealed class JsonProfileStorageService : IProfileStorageService
 
         Directory.CreateDirectory(directoryPath);
 
-        await using var stream = File.Create(_filePath);
+        await using var stream = File.Create(filePath);
         await JsonSerializer.SerializeAsync(stream, profiles, JsonOptions, cancellationToken);
     }
 }

@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="OpenMyDear.Wpf"
-        Height="700"
-        Width="1100"
-        MinHeight="600"
-        MinWidth="950">
+        Topmost="{Binding AlwaysOnTop, Mode=TwoWay}"
+        Height="760"
+        Width="1220"
+        MinHeight="640"
+        MinWidth="980">
     <Grid Margin="12">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="280" />
@@ -18,11 +19,15 @@
 
         <Border Grid.Column="0" BorderBrush="#DDD" BorderThickness="1" Padding="10">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Top" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,10" Text="Profiles" />
+                <TextBlock DockPanel.Dock="Top"
+                           FontWeight="SemiBold"
+                           FontSize="16"
+                           Margin="0,0,0,10"
+                           Text="{Binding Localizer[Profiles]}" />
 
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,10,0,0">
-                    <Button Content="Add" Width="80" Margin="0,0,8,0" Command="{Binding AddProfileCommand}" />
-                    <Button Content="Delete" Width="80" Command="{Binding RemoveProfileCommand}" />
+                    <Button Content="{Binding Localizer[Add]}" Width="80" Margin="0,0,8,0" Command="{Binding AddProfileCommand}" />
+                    <Button Content="{Binding Localizer[Delete]}" Width="80" Command="{Binding RemoveProfileCommand}" />
                 </StackPanel>
 
                 <ListBox ItemsSource="{Binding Profiles}"
@@ -40,10 +45,59 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <GroupBox Header="Profile" Grid.Row="0" Padding="10" Margin="0,0,0,10">
+            <GroupBox Header="{Binding Localizer[Settings]}" Grid.Row="0" Padding="10" Margin="0,0,0,10">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="140" />
+                        <ColumnDefinition Width="170" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="{Binding Localizer[RunAtStartup]}" />
+                    <CheckBox Grid.Row="0" Grid.Column="1" Margin="0,0,0,8" IsChecked="{Binding AutostartEnabled, Mode=TwoWay}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="{Binding Localizer[AlwaysOnTop]}" />
+                    <CheckBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,8" IsChecked="{Binding AlwaysOnTop, Mode=TwoWay}" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="{Binding Localizer[Language]}" />
+                    <ComboBox Grid.Row="2"
+                              Grid.Column="1"
+                              Margin="0,0,0,8"
+                              Width="150"
+                              SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                              ItemsSource="{Binding SupportedLanguages}" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0" Text="{Binding Localizer[StorageDirectory]}" />
+                    <TextBox Grid.Row="3"
+                             Grid.Column="1"
+                             Margin="0,0,8,0"
+                             IsReadOnly="True"
+                             Text="{Binding StorageDirectory}" />
+                    <Button Grid.Row="3"
+                            Grid.Column="2"
+                            Margin="0,0,8,0"
+                            Width="90"
+                            Content="{Binding Localizer[Browse]}"
+                            Command="{Binding BrowseStorageDirectoryCommand}" />
+                    <Button Grid.Row="3"
+                            Grid.Column="3"
+                            Width="90"
+                            Content="{Binding Localizer[Clear]}"
+                            Command="{Binding ClearStorageDirectoryCommand}" />
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="{Binding Localizer[Profile]}" Grid.Row="1" Padding="10" Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="170" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -52,14 +106,14 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="Name" />
+                    <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="{Binding Localizer[Name]}" />
                     <TextBox Grid.Row="0"
                              Grid.Column="1"
                              Margin="0,0,0,8"
                              IsEnabled="{Binding HasSelectedProfile}"
                              Text="{Binding SelectedProfile.Name, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="Launch Mode" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,8" Text="{Binding Localizer[LaunchMode]}" />
                     <ComboBox Grid.Row="1"
                               Grid.Column="1"
                               Margin="0,0,0,8"
@@ -67,7 +121,7 @@
                               ItemsSource="{Binding LaunchModes}"
                               SelectedItem="{Binding SelectedProfile.LaunchMode, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Delay Seconds" />
+                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="{Binding Localizer[DelaySeconds]}" />
                     <TextBox Grid.Row="2"
                              Grid.Column="1"
                              IsEnabled="{Binding HasSelectedProfile}"
@@ -75,44 +129,78 @@
                 </Grid>
             </GroupBox>
 
-            <GroupBox Header="Items" Grid.Row="2" Padding="10" Margin="0,0,0,10">
-                <DockPanel>
-                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,10,0,0">
-                        <Button Content="Add Item" Width="100" Margin="0,0,8,0" Command="{Binding AddItemCommand}" />
-                        <Button Content="Remove Item" Width="110" Command="{Binding RemoveItemCommand}" />
-                    </StackPanel>
+            <GroupBox Header="{Binding Localizer[Items]}" Grid.Row="2" Padding="10" Margin="0,0,0,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                    <DataGrid ItemsSource="{Binding SelectedProfile.Items}"
+                    <DataGrid Grid.Row="0"
+                              ItemsSource="{Binding SelectedProfile.Items}"
                               SelectedItem="{Binding SelectedItem}"
                               AutoGenerateColumns="False"
                               IsReadOnly="False"
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
+                              Margin="0,0,0,10"
                               IsEnabled="{Binding HasSelectedProfile}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Label"
+                            <DataGridTextColumn Header="{Binding Localizer[Label]}"
                                                 Width="180"
                                                 Binding="{Binding Label, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTextColumn Header="Path"
+                            <DataGridTextColumn Header="{Binding Localizer[Path]}"
                                                 Width="*"
                                                 Binding="{Binding Path, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridComboBoxColumn Header="Type"
+                            <DataGridComboBoxColumn Header="{Binding Localizer[Type]}"
                                                     Width="120"
                                                     SelectedItemBinding="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
                                                     ItemsSource="{Binding DataContext.ItemTypes, RelativeSource={RelativeSource AncestorType=Window}}" />
                         </DataGrid.Columns>
                     </DataGrid>
-                </DockPanel>
+
+                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0" Text="{Binding Localizer[OpenWithPath]}" />
+                        <TextBox Grid.Column="1"
+                                 Margin="0,0,8,0"
+                                 IsEnabled="{Binding HasSelectedItem}"
+                                 Text="{Binding SelectedItem.OpenWith, UpdateSourceTrigger=PropertyChanged}" />
+                        <Button Grid.Column="2"
+                                Width="90"
+                                Margin="0,0,8,0"
+                                IsEnabled="{Binding HasSelectedItem}"
+                                Content="{Binding Localizer[PickApp]}"
+                                Command="{Binding PickOpenWithCommand}" />
+                        <Button Grid.Column="3"
+                                Width="90"
+                                IsEnabled="{Binding HasSelectedItem}"
+                                Content="{Binding Localizer[Clear]}"
+                                Command="{Binding ClearOpenWithCommand}" />
+                    </Grid>
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal">
+                        <Button Content="{Binding Localizer[AddItem]}" Width="100" Margin="0,0,8,0" Command="{Binding AddItemCommand}" />
+                        <Button Content="{Binding Localizer[RemoveItem]}" Width="110" Command="{Binding RemoveItemCommand}" />
+                    </StackPanel>
+                </Grid>
             </GroupBox>
 
             <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,10">
-                <Button Content="Run"
+                <Button Content="{Binding Localizer[Run]}"
                         Width="120"
                         Height="32"
                         Command="{Binding RunProfileCommand}" />
             </StackPanel>
 
-            <GroupBox Grid.Row="4" Header="Run Result" Padding="10">
+            <GroupBox Grid.Row="4" Header="{Binding Localizer[RunResult]}" Padding="10">
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top"
                                Text="{Binding RunStatus}"

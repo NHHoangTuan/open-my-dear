@@ -11,9 +11,20 @@ namespace OpenMyDear.Wpf.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
-    private readonly IProfileStorageService _storageService;
+    private readonly IProfileStorageService _profileStorageService;
+    private readonly IConfigService _configService;
+    private readonly IProfileMigrationService _profileMigrationService;
     private readonly IProfileLauncherService _launcherService;
-    private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
+    private readonly IAutostartService _autostartService;
+    private readonly IInstalledAppDiscoveryService _installedAppDiscoveryService;
+    private readonly IAppPickerDialogService _appPickerDialogService;
+    private readonly IFolderPickerService _folderPickerService;
+    private readonly SemaphoreSlim _saveProfilesSemaphore = new(1, 1);
+    private readonly SemaphoreSlim _saveConfigSemaphore = new(1, 1);
+
+    private AppConfigModel _config = new();
+    private bool _isInitialized;
+    private bool _suspendAutoSave;
 
     [ObservableProperty]
     private ProfileViewModel? _selectedProfile;
@@ -27,6 +38,18 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private bool _isBusy;
 
+    [ObservableProperty]
+    private bool _alwaysOnTop;
+
+    [ObservableProperty]
+    private bool _autostartEnabled;
+
+    [ObservableProperty]
+    private string? _storageDirectory;
+
+    [ObservableProperty]
+    private string _selectedLanguage = "en";
+
     public ObservableCollection<ProfileViewModel> Profiles { get; } = [];
 
     public ObservableCollection<string> RunErrors { get; } = [];
@@ -35,14 +58,34 @@ public partial class MainWindowViewModel : ObservableObject
 
     public ItemType[] ItemTypes { get; } = Enum.GetValues<ItemType>();
 
+    public ILocalizationService Localizer { get; }
+
+    public string[] SupportedLanguages => Localizer.SupportedLanguages;
+
     public bool HasSelectedProfile => SelectedProfile is not null;
 
     public bool HasSelectedItem => SelectedItem is not null;
 
-    public MainWindowViewModel(IProfileStorageService storageService, IProfileLauncherService launcherService)
+    public MainWindowViewModel(
+        IProfileStorageService profileStorageService,
+        IConfigService configService,
+        IProfileMigrationService profileMigrationService,
+        IProfileLauncherService launcherService,
+        IAutostartService autostartService,
+        IInstalledAppDiscoveryService installedAppDiscoveryService,
+        IAppPickerDialogService appPickerDialogService,
+        IFolderPickerService folderPickerService,
+        ILocalizationService localizationService)
     {
-        _storageService = storageService;
+        _profileStorageService = profileStorageService;
+        _configService = configService;
+        _profileMigrationService = profileMigrationService;
         _launcherService = launcherService;
+        _autostartService = autostartService;
+        _installedAppDiscoveryService = installedAppDiscoveryService;
+        _appPickerDialogService = appPickerDialogService;
+        _folderPickerService = folderPickerService;
+        Localizer = localizationService;
 
         Profiles.CollectionChanged += OnProfilesCollectionChanged;
     }
@@ -51,19 +94,32 @@ public partial class MainWindowViewModel : ObservableObject
     {
         try
         {
-            var profileModels = await _storageService.LoadAsync();
-            foreach (var model in profileModels)
+            _config = await _configService.LoadAsync();
+            StorageDirectory = _config.StorageDirectory;
+            AlwaysOnTop = _config.AlwaysOnTop;
+            AutostartEnabled = _config.AutostartEnabled;
+            SelectedLanguage = string.IsNullOrWhiteSpace(_config.Language) ? "en" : _config.Language;
+
+            await Localizer.SetLanguageAsync(SelectedLanguage);
+            SelectedLanguage = Localizer.CurrentLanguage;
+
+            await LoadProfilesAsync();
+
+            if (AutostartEnabled)
             {
-                var profile = new ProfileViewModel(model);
-                Profiles.Add(profile);
+                var syncResult = await _autostartService.SetEnabledAsync(true);
+                if (!syncResult.Succeeded)
+                {
+                    RunStatus = $"{Localizer["StatusAutostartSyncFailed"]}: {syncResult.Error}";
+                }
             }
 
-            SelectedProfile = Profiles.FirstOrDefault();
-            RunStatus = "Profiles loaded";
+            _isInitialized = true;
+            RunStatus = Localizer["StatusProfilesLoaded"];
         }
         catch (Exception ex)
         {
-            RunStatus = $"Failed to load profiles: {ex.Message}";
+            RunStatus = $"{Localizer["StatusLoadFailed"]}: {ex.Message}";
         }
     }
 
@@ -73,7 +129,7 @@ public partial class MainWindowViewModel : ObservableObject
         var nextNumber = Profiles.Count + 1;
         var profile = new ProfileViewModel
         {
-            Name = $"Profile {nextNumber}"
+            Name = $"{Localizer["ProfileDefaultName"]} {nextNumber}"
         };
 
         Profiles.Add(profile);
@@ -89,12 +145,9 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        var profileToRemove = SelectedProfile;
-        Profiles.Remove(profileToRemove);
-
+        Profiles.Remove(SelectedProfile);
         SelectedProfile = Profiles.FirstOrDefault();
-        SelectedItem = null;
-
+        SelectedItem = SelectedProfile?.Items.FirstOrDefault();
         TriggerAutoSave();
     }
 
@@ -108,9 +161,9 @@ public partial class MainWindowViewModel : ObservableObject
 
         var newItem = new LaunchItemViewModel
         {
-            Label = "New Item",
-            Path = string.Empty,
-            Type = ItemType.App
+            Label = Localizer["ItemDefaultLabel"],
+            Type = ItemType.App,
+            Path = string.Empty
         };
 
         SelectedProfile.Items.Add(newItem);
@@ -127,13 +180,58 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         SelectedProfile.Items.Remove(SelectedItem);
-        SelectedItem = null;
+        SelectedItem = SelectedProfile.Items.FirstOrDefault();
         TriggerAutoSave();
     }
 
-    private bool CanRemoveItem()
+    [RelayCommand(CanExecute = nameof(HasSelectedItem))]
+    private async Task PickOpenWithAsync()
     {
-        return SelectedProfile is not null && SelectedItem is not null;
+        if (SelectedItem is null)
+        {
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            RunStatus = Localizer["StatusLoadingApps"];
+
+            var apps = await _installedAppDiscoveryService.GetInstalledAppsAsync();
+            var selected = _appPickerDialogService.PickApp(apps);
+            if (selected is null)
+            {
+                RunStatus = Localizer["StatusReady"];
+                return;
+            }
+
+            SelectedItem.OpenWith = selected.ExecutablePath;
+            SelectedItem.OpenWithName = selected.Name;
+            TriggerAutoSave();
+            RunStatus = Localizer["StatusOpenWithUpdated"];
+        }
+        catch (Exception ex)
+        {
+            RunStatus = $"{Localizer["StatusLoadingAppsFailed"]}: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(HasSelectedItem))]
+    private void ClearOpenWith()
+    {
+        if (SelectedItem is null)
+        {
+            return;
+        }
+
+        SelectedItem.OpenWith = null;
+        SelectedItem.OpenWithName = null;
+        SelectedItem.OpenWithIcon = null;
+        TriggerAutoSave();
     }
 
     [RelayCommand(CanExecute = nameof(HasSelectedProfile))]
@@ -148,19 +246,28 @@ public partial class MainWindowViewModel : ObservableObject
         {
             IsBusy = true;
             RunErrors.Clear();
-            RunStatus = "Running profile...";
+            RunStatus = Localizer["StatusRunningProfile"];
 
             var result = await _launcherService.RunAsync(SelectedProfile.ToModel());
-            foreach (var error in result.Errors)
+            foreach (var warning in result.Warnings)
             {
-                RunErrors.Add(error.ToString());
+                RunErrors.Add($"[{Localizer["RunWarning"]}] {warning}");
             }
 
-            RunStatus = $"Run completed - Total: {result.Total}, Succeeded: {result.Succeeded}, Failed: {result.Failed}";
+            foreach (var error in result.Errors)
+            {
+                RunErrors.Add($"[{Localizer["RunError"]}] {error}");
+            }
+
+            RunStatus = string.Format(
+                Localizer["StatusRunCompleted"],
+                result.Total,
+                result.Succeeded,
+                result.Failed);
         }
         catch (Exception ex)
         {
-            RunStatus = $"Run failed: {ex.Message}";
+            RunStatus = $"{Localizer["StatusRunFailed"]}: {ex.Message}";
         }
         finally
         {
@@ -174,13 +281,89 @@ public partial class MainWindowViewModel : ObservableObject
         TriggerAutoSave();
     }
 
+    [RelayCommand]
+    private async Task BrowseStorageDirectoryAsync()
+    {
+        var current = string.IsNullOrWhiteSpace(StorageDirectory)
+            ? AppPaths.DefaultAppDataDirectory
+            : StorageDirectory;
+
+        var selected = _folderPickerService.PickFolder(current);
+        if (string.IsNullOrWhiteSpace(selected))
+        {
+            return;
+        }
+
+        await ChangeStorageDirectoryAsync(selected);
+    }
+
+    [RelayCommand]
+    private async Task ClearStorageDirectoryAsync()
+    {
+        await ChangeStorageDirectoryAsync(null);
+    }
+
+    private async Task ChangeStorageDirectoryAsync(string? newDirectory)
+    {
+        try
+        {
+            IsBusy = true;
+            var migration = await _profileMigrationService.MoveProfilesAsync(_config.StorageDirectory, newDirectory);
+            if (!migration.Succeeded)
+            {
+                RunStatus = $"{Localizer["StatusStorageUpdateFailed"]}: {migration.Error}";
+                return;
+            }
+
+            _config.StorageDirectory = newDirectory;
+            StorageDirectory = newDirectory;
+            await SaveConfigAsync();
+            await LoadProfilesAsync();
+            RunStatus = Localizer["StatusStorageUpdated"];
+        }
+        catch (Exception ex)
+        {
+            RunStatus = $"{Localizer["StatusStorageUpdateFailed"]}: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task LoadProfilesAsync()
+    {
+        _suspendAutoSave = true;
+        try
+        {
+            Profiles.Clear();
+            var profileModels = await _profileStorageService.LoadAsync(_config.StorageDirectory);
+            foreach (var model in profileModels)
+            {
+                Profiles.Add(new ProfileViewModel(model));
+            }
+
+            SelectedProfile = Profiles.FirstOrDefault();
+            SelectedItem = SelectedProfile?.Items.FirstOrDefault();
+        }
+        finally
+        {
+            _suspendAutoSave = false;
+        }
+    }
+
+    private bool CanRemoveItem()
+    {
+        return SelectedProfile is not null && SelectedItem is not null;
+    }
+
     private void OnProfilesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems is not null)
         {
             foreach (var profile in e.NewItems.OfType<ProfileViewModel>())
             {
-                AttachProfile(profile);
+                profile.Changed += OnProfileChanged;
             }
         }
 
@@ -188,19 +371,9 @@ public partial class MainWindowViewModel : ObservableObject
         {
             foreach (var profile in e.OldItems.OfType<ProfileViewModel>())
             {
-                DetachProfile(profile);
+                profile.Changed -= OnProfileChanged;
             }
         }
-    }
-
-    private void AttachProfile(ProfileViewModel profile)
-    {
-        profile.Changed += OnProfileChanged;
-    }
-
-    private void DetachProfile(ProfileViewModel profile)
-    {
-        profile.Changed -= OnProfileChanged;
     }
 
     private void OnProfileChanged(object? sender, EventArgs e)
@@ -210,26 +383,44 @@ public partial class MainWindowViewModel : ObservableObject
 
     private void TriggerAutoSave()
     {
+        if (!_isInitialized || _suspendAutoSave)
+        {
+            return;
+        }
+
         SaveProfilesAsync().SafeFireAndForget(ex =>
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                RunStatus = $"Auto-save failed: {ex.Message}";
+                RunStatus = $"{Localizer["StatusAutosaveFailed"]}: {ex.Message}";
             });
         });
     }
 
-    private async Task SaveProfilesAsync()
+    private async Task SaveProfilesAsync(CancellationToken cancellationToken = default)
     {
-        await _saveSemaphore.WaitAsync();
+        await _saveProfilesSemaphore.WaitAsync(cancellationToken);
         try
         {
             var profileModels = Profiles.Select(profile => profile.ToModel()).ToList();
-            await _storageService.SaveAsync(profileModels);
+            await _profileStorageService.SaveAsync(profileModels, _config.StorageDirectory, cancellationToken);
         }
         finally
         {
-            _saveSemaphore.Release();
+            _saveProfilesSemaphore.Release();
+        }
+    }
+
+    private async Task SaveConfigAsync(CancellationToken cancellationToken = default)
+    {
+        await _saveConfigSemaphore.WaitAsync(cancellationToken);
+        try
+        {
+            await _configService.SaveAsync(_config, cancellationToken);
+        }
+        finally
+        {
+            _saveConfigSemaphore.Release();
         }
     }
 
@@ -247,5 +438,80 @@ public partial class MainWindowViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(HasSelectedItem));
         RemoveItemCommand.NotifyCanExecuteChanged();
+        PickOpenWithCommand.NotifyCanExecuteChanged();
+        ClearOpenWithCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnAlwaysOnTopChanged(bool value)
+    {
+        if (!_isInitialized)
+        {
+            return;
+        }
+
+        _config.AlwaysOnTop = value;
+        SaveConfigAsync().SafeFireAndForget(ex =>
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                RunStatus = $"{Localizer["StatusConfigSaveFailed"]}: {ex.Message}";
+            });
+        });
+    }
+
+    partial void OnAutostartEnabledChanged(bool value)
+    {
+        if (!_isInitialized)
+        {
+            return;
+        }
+
+        UpdateAutostartAsync(value).SafeFireAndForget(ex =>
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                RunStatus = $"{Localizer["StatusAutostartUpdateFailed"]}: {ex.Message}";
+            });
+        });
+    }
+
+    partial void OnSelectedLanguageChanged(string value)
+    {
+        if (!_isInitialized)
+        {
+            return;
+        }
+
+        UpdateLanguageAsync(value).SafeFireAndForget(ex =>
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                RunStatus = $"{Localizer["StatusLanguageUpdateFailed"]}: {ex.Message}";
+            });
+        });
+    }
+
+    private async Task UpdateAutostartAsync(bool enabled)
+    {
+        var result = await _autostartService.SetEnabledAsync(enabled);
+        if (!result.Succeeded)
+        {
+            RunStatus = $"{Localizer["StatusAutostartUpdateFailed"]}: {result.Error}";
+            AutostartEnabled = !enabled;
+            return;
+        }
+
+        _config.AutostartEnabled = enabled;
+        await SaveConfigAsync();
+        RunStatus = Localizer["StatusAutostartUpdated"];
+    }
+
+    private async Task UpdateLanguageAsync(string languageCode)
+    {
+        await Localizer.SetLanguageAsync(languageCode);
+        _config.Language = Localizer.CurrentLanguage;
+        SelectedLanguage = Localizer.CurrentLanguage;
+        await SaveConfigAsync();
+        RunStatus = Localizer["StatusLanguageUpdated"];
     }
 }

@@ -9,4 +9,10 @@ public sealed class LaunchItemModel
     public string Path { get; set; } = string.Empty;
 
     public ItemType Type { get; set; } = ItemType.App;
+
+    public string? OpenWith { get; set; }
+
+    public string? OpenWithName { get; set; }
+
+    public string? OpenWithIcon { get; set; }
 }

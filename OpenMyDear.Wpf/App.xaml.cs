@@ -5,15 +5,33 @@ using OpenMyDear.Wpf.Views;
 
 namespace OpenMyDear.Wpf;
 
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
+        var localizationService = new JsonLocalizationService();
         var storageService = new JsonProfileStorageService();
+        var configService = new JsonConfigService();
+        var migrationService = new ProfileMigrationService();
         var launcherService = new ProfileLauncherService();
-        var mainWindowViewModel = new MainWindowViewModel(storageService, launcherService);
+        var autostartService = new AutostartService();
+        var installedAppDiscoveryService = new InstalledAppDiscoveryService();
+        var appPickerDialogService = new AppPickerDialogService(localizationService);
+        var folderPickerService = new FolderPickerService();
+
+        var mainWindowViewModel = new MainWindowViewModel(
+            storageService,
+            configService,
+            migrationService,
+            launcherService,
+            autostartService,
+            installedAppDiscoveryService,
+            appPickerDialogService,
+            folderPickerService,
+            localizationService);
+
         await mainWindowViewModel.InitializeAsync();
 
         var mainWindow = new MainWindow

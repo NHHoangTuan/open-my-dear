@@ -22,7 +22,7 @@ public sealed class ProfileLauncherService : IProfileLauncherService
         }
 
         var delay = TimeSpan.FromSeconds(Math.Max(0, profile.DelaySeconds));
-        var sequentialResults = new List<(LaunchItemModel Item, bool Succeeded, string? ErrorMessage)>();
+        var sequentialResults = new List<LaunchOutcome>();
 
         foreach (var item in profile.Items)
         {
@@ -41,10 +41,15 @@ public sealed class ProfileLauncherService : IProfileLauncherService
 
     private static void BuildResult(
         ProfileRunResultModel result,
-        IEnumerable<(LaunchItemModel Item, bool Succeeded, string? ErrorMessage)> launchResults)
+        IEnumerable<LaunchOutcome> launchResults)
     {
         foreach (var launchResult in launchResults)
         {
+            if (!string.IsNullOrWhiteSpace(launchResult.WarningMessage))
+            {
+                result.Warnings.Add($"{launchResult.Item.Label}: {launchResult.WarningMessage}");
+            }
+
             if (launchResult.Succeeded)
             {
                 result.Succeeded++;
@@ -61,7 +66,7 @@ public sealed class ProfileLauncherService : IProfileLauncherService
         }
     }
 
-    private static Task<(LaunchItemModel Item, bool Succeeded, string? ErrorMessage)> LaunchItemAsync(
+    private static Task<LaunchOutcome> LaunchItemAsync(
         LaunchItemModel item,
         CancellationToken cancellationToken)
     {
@@ -69,23 +74,43 @@ public sealed class ProfileLauncherService : IProfileLauncherService
 
         if (!PathExists(item))
         {
-            return Task.FromResult<(LaunchItemModel Item, bool Succeeded, string? ErrorMessage)>((item, false, "Path not found"));
+            return Task.FromResult(new LaunchOutcome(item, false, "Path not found", null));
         }
+
+        var warningMessage = default(string);
 
         try
         {
-            var startInfo = new ProcessStartInfo
+            if (!string.IsNullOrWhiteSpace(item.OpenWith))
+            {
+                if (File.Exists(item.OpenWith))
+                {
+                    var openWithStartInfo = new ProcessStartInfo
+                    {
+                        FileName = item.OpenWith,
+                        Arguments = $"\"{item.Path}\"",
+                        UseShellExecute = true
+                    };
+
+                    Process.Start(openWithStartInfo);
+                    return Task.FromResult(new LaunchOutcome(item, true, null, null));
+                }
+
+                warningMessage = "OpenWith path invalid. Used default open.";
+            }
+
+            var defaultStartInfo = new ProcessStartInfo
             {
                 FileName = item.Path,
                 UseShellExecute = true
             };
 
-            Process.Start(startInfo);
-            return Task.FromResult<(LaunchItemModel Item, bool Succeeded, string? ErrorMessage)>((item, true, null));
+            Process.Start(defaultStartInfo);
+            return Task.FromResult(new LaunchOutcome(item, true, null, warningMessage));
         }
         catch (Exception ex)
         {
-            return Task.FromResult<(LaunchItemModel Item, bool Succeeded, string? ErrorMessage)>((item, false, ex.Message));
+            return Task.FromResult(new LaunchOutcome(item, false, ex.Message, warningMessage));
         }
     }
 
@@ -99,4 +124,6 @@ public sealed class ProfileLauncherService : IProfileLauncherService
             _ => false
         };
     }
+
+    private sealed record LaunchOutcome(LaunchItemModel Item, bool Succeeded, string? ErrorMessage, string? WarningMessage);
 }

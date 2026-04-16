@@ -1,0 +1,51 @@
+<Window x:Class="OpenMyDear.Wpf.Views.InstalledAppsPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="OpenMyDear"
+        Height="500"
+        Width="760"
+        MinHeight="420"
+        MinWidth="640"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0"
+                 Margin="0,0,0,10"
+                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding FilteredApps}"
+                  SelectedItem="{Binding SelectedApp}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="{Binding Localizer[PickerColumnName]}"
+                                    Width="230"
+                                    Binding="{Binding Name}" />
+                <DataGridTextColumn Header="{Binding Localizer[PickerColumnPath]}"
+                                    Width="*"
+                                    Binding="{Binding ExecutablePath}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,10,0,0">
+            <Button Width="95"
+                    Margin="0,0,8,0"
+                    IsDefault="True"
+                    Click="OnOkClicked"
+                    Content="{Binding Localizer[PickerOk]}" />
+            <Button Width="95"
+                    IsCancel="True"
+                    Content="{Binding Localizer[PickerCancel]}" />
+        </StackPanel>
+    </Grid>
+</Window>
