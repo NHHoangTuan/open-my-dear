@@ -319,8 +319,9 @@
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                <TextBlock Text="{Binding Localizer[Path]}" Style="{StaticResource CaptionTextStyle}" />
-                                <TextBlock Text="{Binding Localizer[PathHelper]}"
+                                <TextBlock Text="{Binding Localizer[Path]}" Style="{StaticResource CaptionTextStyle}" 
+                                           TextWrapping="WrapWithOverflow"/>
+                                <TextBlock Text="{Binding Localizer[PathHelper]}" TextWrapping="WrapWithOverflow"
                                            Style="{StaticResource CaptionTextStyle}"
                                            Margin="0,2,0,0" />
                             </StackPanel>
@@ -362,8 +363,9 @@
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                <TextBlock Text="{Binding Localizer[OpenWithPath]}" Style="{StaticResource CaptionTextStyle}" />
-                                <TextBlock Text="{Binding Localizer[OpenWithHelper]}"
+                                <TextBlock Text="{Binding Localizer[OpenWithPath]}" Style="{StaticResource CaptionTextStyle}" 
+                                           TextWrapping="WrapWithOverflow"/>
+                                <TextBlock Text="{Binding Localizer[OpenWithHelper]}" TextWrapping="WrapWithOverflow"
                                            Style="{StaticResource CaptionTextStyle}"
                                            Margin="0,2,0,0" />
                             </StackPanel>
