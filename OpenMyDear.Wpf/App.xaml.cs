@@ -21,6 +21,7 @@ public partial class App : System.Windows.Application
         var installedAppDiscoveryService = new InstalledAppDiscoveryService();
         var appPickerDialogService = new AppPickerDialogService(localizationService);
         var folderPickerService = new FolderPickerService();
+        var appVersionService = new AppVersionService();
 
         var mainWindowViewModel = new MainWindowViewModel(
             storageService,
@@ -32,7 +33,8 @@ public partial class App : System.Windows.Application
             appPickerDialogService,
             folderPickerService,
             localizationService,
-            themeService);
+            themeService,
+            appVersionService);
 
         await mainWindowViewModel.InitializeAsync();
 

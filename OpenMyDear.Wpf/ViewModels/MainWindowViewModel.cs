@@ -21,6 +21,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly IAppPickerDialogService _appPickerDialogService;
     private readonly IFolderPickerService _folderPickerService;
     private readonly IThemeService _themeService;
+    private readonly IAppVersionService _appVersionService;
     private readonly SemaphoreSlim _saveProfilesSemaphore = new(1, 1);
     private readonly SemaphoreSlim _saveConfigSemaphore = new(1, 1);
 
@@ -81,6 +82,8 @@ public partial class MainWindowViewModel : ObservableObject
 
     public string[] SupportedThemes => _themeService.SupportedThemes;
 
+    public string AppVersion => _appVersionService.GetDisplayVersion();
+
     public bool HasSelectedProfile => SelectedProfile is not null;
 
     public bool HasSelectedItem => SelectedItem is not null;
@@ -95,7 +98,8 @@ public partial class MainWindowViewModel : ObservableObject
         IAppPickerDialogService appPickerDialogService,
         IFolderPickerService folderPickerService,
         ILocalizationService localizationService,
-        IThemeService themeService)
+        IThemeService themeService,
+        IAppVersionService appVersionService)
     {
         _profileStorageService = profileStorageService;
         _configService = configService;
@@ -106,6 +110,7 @@ public partial class MainWindowViewModel : ObservableObject
         _appPickerDialogService = appPickerDialogService;
         _folderPickerService = folderPickerService;
         _themeService = themeService;
+        _appVersionService = appVersionService;
         Localizer = localizationService;
 
         Profiles.CollectionChanged += OnProfilesCollectionChanged;
