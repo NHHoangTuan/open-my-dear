@@ -8,4 +8,15 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
     }
+
+    private void OnOpenSettingsClicked(object sender, RoutedEventArgs e)
+    {
+        var settingsWindow = new SettingsWindow
+        {
+            Owner = this,
+            DataContext = DataContext
+        };
+
+        settingsWindow.ShowDialog();
+    }
 }

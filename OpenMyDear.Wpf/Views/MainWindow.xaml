@@ -31,12 +31,41 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" Margin="0,0,0,12">
-                    <TextBlock Text="OpenMyDear" Style="{StaticResource TitleTextStyle}" />
-                    <TextBlock Text="{Binding Localizer[Profiles]}"
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Grid.Column="0"
+                               Text="OpenMyDear"
+                               Style="{StaticResource TitleTextStyle}" />
+
+                    <Button Grid.Row="0"
+                            Grid.Column="1"
+        Style="{StaticResource GhostButtonStyle}"
+        Click="OnOpenSettingsClicked"
+        ToolTip="{Binding Localizer[Settings]}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                       TextAlignment="Center"
+           Text="&#xE713;" 
+           FontSize="22" />
+                        </StackPanel>
+                    </Button>
+
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="0"
+                               Grid.ColumnSpan="2"
+                               Text="{Binding Localizer[Profiles]}"
                                Style="{StaticResource CaptionTextStyle}"
                                Margin="0,4,0,0" />
-                </StackPanel>
+                </Grid>
 
                 <Separator Grid.Row="1" />
 
@@ -93,7 +122,6 @@
         <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" Padding="0 0 15 0">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -358,67 +386,7 @@
                     </Grid>
                 </Border>
 
-                <Border Grid.Row="3" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="190" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="110" />
-                            <ColumnDefinition Width="110" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Localizer[Settings]}" Style="{StaticResource SectionHeaderTextStyle}" />
-
-                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,12,8,8" Text="{Binding Localizer[RunAtStartup]}" VerticalAlignment="Center" />
-                        <CheckBox Grid.Row="1" Grid.Column="1" Margin="0,12,0,8" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding AutostartEnabled, Mode=TwoWay}" />
-
-                        <TextBlock Grid.Row="1" Grid.Column="2" Margin="8,12,8,8" Text="{Binding Localizer[AlwaysOnTop]}" VerticalAlignment="Center" />
-                        <CheckBox Grid.Row="1" Grid.Column="3" Margin="0,12,0,8" Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding AlwaysOnTop, Mode=TwoWay}" />
-
-                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,4,8,8" Text="{Binding Localizer[Language]}" VerticalAlignment="Center" />
-                        <ComboBox Grid.Row="2"
-                                  Grid.Column="1"
-                                  Margin="0,4,8,8"
-                                  Width="160"
-                                  SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
-                                  ItemsSource="{Binding SupportedLanguages}" />
-
-                        <!--<TextBlock Grid.Row="2" Grid.Column="2" Margin="8,4,8,8" Text="{Binding Localizer[Theme]}" VerticalAlignment="Center" />
-                        <ComboBox Grid.Row="2"
-                                  Grid.Column="3"
-                                  Margin="0,4,0,8"
-                                  Width="100"
-                                  SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
-                                  ItemsSource="{Binding SupportedThemes}" />-->
-
-                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,0,8,0" Text="{Binding Localizer[StorageDirectory]}" VerticalAlignment="Center" />
-                        <TextBox Grid.Row="3"
-                                 Grid.Column="1"
-                                 Grid.ColumnSpan="2"
-                                 Margin="0,0,8,0"
-                                 IsReadOnly="True"
-                                 Text="{Binding StorageDirectory}" />
-                        <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Horizontal">
-                            <Button Style="{StaticResource SecondaryButtonStyle}"
-                                    Width="72"
-                                    Margin="0,0,8,0"
-                                    Content="{Binding Localizer[Browse]}"
-                                    Command="{Binding BrowseStorageDirectoryCommand}" />
-                            <Button Style="{StaticResource GhostButtonStyle}"
-                                    Width="64"
-                                    Content="{Binding Localizer[Clear]}"
-                                    Command="{Binding ClearStorageDirectoryCommand}" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <Border Grid.Row="4" Style="{StaticResource CardBorderStyle}">
+                <Border Grid.Row="3" Style="{StaticResource CardBorderStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />

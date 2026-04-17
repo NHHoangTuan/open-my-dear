@@ -22,6 +22,7 @@
   "Theme": "Theme",
   "Browse": "Browse",
   "Clear": "Clear",
+  "Close": "Close",
   "OpenWithPath": "Open With path",
   "OpenWithHelper": "Editor app for this item",
   "PathHelper": "Path to app/file/folder for this item",
