@@ -44,6 +44,7 @@
   "StatusProfilesLoaded": "Profiles loaded",
   "StatusLoadFailed": "Failed to load data",
   "StatusRunningProfile": "Running profile...",
+  "StatusRunningItem": "Running item: {0}",
   "StatusRunCompleted": "Run completed - Total: {0}, Succeeded: {1}, Failed: {2}",
   "StatusRunFailed": "Run failed",
   "StatusAutosaveFailed": "Auto-save failed",

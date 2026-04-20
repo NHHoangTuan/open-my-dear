@@ -289,6 +289,12 @@
                                             </StackPanel>
 
                                             <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Button Style="{StaticResource SecondaryButtonStyle}"
+                                                        MinWidth="70"
+                                                        Margin="0,0,6,0"
+                                                        Content="{Binding DataContext.Localizer[Run], RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        Command="{Binding DataContext.RunItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}" />
                                                 <Button Style="{StaticResource GhostButtonStyle}"
                                                         MinWidth="70"
                                                         Margin="0,0,6,0"

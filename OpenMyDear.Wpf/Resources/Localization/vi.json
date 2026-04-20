@@ -44,6 +44,7 @@
   "StatusProfilesLoaded": "Đã tải hồ sơ",
   "StatusLoadFailed": "Không thể tải dữ liệu",
   "StatusRunningProfile": "Đang chạy hồ sơ...",
+  "StatusRunningItem": "Đang chạy mục: {0}",
   "StatusRunCompleted": "Chạy xong - Tổng: {0}, Thành công: {1}, Thất bại: {2}",
   "StatusRunFailed": "Chạy thất bại",
   "StatusAutosaveFailed": "Tự lưu thất bại",

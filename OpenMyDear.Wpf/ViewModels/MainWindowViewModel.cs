@@ -360,32 +360,57 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
+        if (IsBusy)
+        {
+            return;
+        }
+
         try
         {
             IsBusy = true;
-            RunErrors.Clear();
             RunStatus = Localizer["StatusRunningProfile"];
-            RunTotal = 0;
-            RunSucceeded = 0;
-            RunFailed = 0;
-            LatestRunIssue = "-";
+            ResetRunResult();
 
             var result = await _launcherService.RunAsync(SelectedProfile.ToModel());
-            RunTotal = result.Total;
-            RunSucceeded = result.Succeeded;
-            RunFailed = result.Failed;
+            ApplyRunResult(result);
 
-            foreach (var warning in result.Warnings)
-            {
-                RunErrors.Add($"[{Localizer["RunWarning"]}] {warning}");
-            }
+            RunStatus = string.Format(
+                Localizer["StatusRunCompleted"],
+                result.Total,
+                result.Succeeded,
+                result.Failed);
+        }
+        catch (Exception ex)
+        {
+            RunStatus = $"{Localizer["StatusRunFailed"]}: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
-            foreach (var error in result.Errors)
-            {
-                RunErrors.Add($"[{Localizer["RunError"]}] {error}");
-            }
+    [RelayCommand(CanExecute = nameof(HasSelectedProfile))]
+    private async Task RunItemAsync(LaunchItemViewModel? item)
+    {
+        if (SelectedProfile is null || item is null)
+        {
+            return;
+        }
 
-            LatestRunIssue = RunErrors.FirstOrDefault() ?? "-";
+        if (IsBusy)
+        {
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            RunStatus = string.Format(Localizer["StatusRunningItem"], item.Label);
+            ResetRunResult();
+
+            var result = await _launcherService.RunItemAsync(item.ToModel());
+            ApplyRunResult(result);
 
             RunStatus = string.Format(
                 Localizer["StatusRunCompleted"],
@@ -552,6 +577,34 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    private void ResetRunResult()
+    {
+        RunErrors.Clear();
+        RunTotal = 0;
+        RunSucceeded = 0;
+        RunFailed = 0;
+        LatestRunIssue = "-";
+    }
+
+    private void ApplyRunResult(ProfileRunResultModel result)
+    {
+        RunTotal = result.Total;
+        RunSucceeded = result.Succeeded;
+        RunFailed = result.Failed;
+
+        foreach (var warning in result.Warnings)
+        {
+            RunErrors.Add($"[{Localizer["RunWarning"]}] {warning}");
+        }
+
+        foreach (var error in result.Errors)
+        {
+            RunErrors.Add($"[{Localizer["RunError"]}] {error}");
+        }
+
+        LatestRunIssue = RunErrors.FirstOrDefault() ?? "-";
+    }
+
     partial void OnSelectedProfileChanged(ProfileViewModel? value)
     {
         OnPropertyChanged(nameof(HasSelectedProfile));
@@ -560,6 +613,7 @@ public partial class MainWindowViewModel : ObservableObject
         AddItemCommand.NotifyCanExecuteChanged();
         RemoveItemCommand.NotifyCanExecuteChanged();
         RunProfileCommand.NotifyCanExecuteChanged();
+        RunItemCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnSelectedItemChanged(LaunchItemViewModel? value)

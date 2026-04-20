@@ -39,6 +39,18 @@ public sealed class ProfileLauncherService : IProfileLauncherService
         return result;
     }
 
+    public async Task<ProfileRunResultModel> RunItemAsync(LaunchItemModel item, CancellationToken cancellationToken = default)
+    {
+        var result = new ProfileRunResultModel
+        {
+            Total = 1
+        };
+
+        var launchResult = await LaunchItemAsync(item, cancellationToken);
+        BuildResult(result, [launchResult]);
+        return result;
+    }
+
     private static void BuildResult(
         ProfileRunResultModel result,
         IEnumerable<LaunchOutcome> launchResults)
