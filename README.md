@@ -43,8 +43,8 @@ Whether you're switching from "Work" to "Gaming" or starting your daily "Develop
 ### Prerequisites
 -   Windows 10 or 11
 -   [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (or higher)
+### Build from Source
 
-### Installation
 1.  **Clone the repository**:
     ```bash
     git clone https://github.com/NHHoangTuan/open-my-dear.git
@@ -57,6 +57,13 @@ Whether you're switching from "Work" to "Gaming" or starting your daily "Develop
     ```bash
     dotnet run
     ```
+
+### Installation
+Download the latest Windows build from the Releases page.
+
+No installation is required for the portable version. Extract the ZIP file and run `OpenMyDear.exe`.
+
+
 
 ---
 
