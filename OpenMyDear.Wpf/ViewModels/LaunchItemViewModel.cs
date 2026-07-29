@@ -26,6 +26,9 @@ public partial class LaunchItemViewModel : ObservableObject
     [ObservableProperty]
     private string? _openWithIcon;
 
+    [ObservableProperty]
+    private bool _isEditing;
+
     public LaunchItemViewModel()
     {
         _id = Guid.NewGuid().ToString();
@@ -35,6 +38,7 @@ public partial class LaunchItemViewModel : ObservableObject
         _openWith = null;
         _openWithName = null;
         _openWithIcon = null;
+        _isEditing = false;
     }
 
     public LaunchItemViewModel(LaunchItemModel model)
@@ -46,6 +50,7 @@ public partial class LaunchItemViewModel : ObservableObject
         _openWith = model.OpenWith;
         _openWithName = model.OpenWithName;
         _openWithIcon = model.OpenWithIcon;
+        _isEditing = false;
     }
 
     public LaunchItemModel ToModel()

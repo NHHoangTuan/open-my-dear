@@ -249,21 +249,52 @@
                                                 </TextBlock>
                                             </Border>
 
-                                            <StackPanel Grid.Column="1" Margin="10,0,10,0">
-                                                <TextBox Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"
-                                                         Background="Transparent"
-                                                         BorderThickness="0"
-                                                         Padding="0"
-                                                         FontWeight="SemiBold"
-                                                         MinHeight="28" />
-                                                <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"
-                                                         Style="{x:Null}"
-                                                         Margin="0,2,0,0"
-                                                         Padding="0"
-                                                         BorderThickness="0"
-                                                         Background="Transparent"
-                                                         Foreground="{DynamicResource Brush.TextSecondary}" />
-                                            </StackPanel>
+                                            <Grid Grid.Column="1" Margin="10,0,10,0">
+                                                <StackPanel>
+                                                    <StackPanel.Style>
+                                                        <Style TargetType="StackPanel">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </StackPanel.Style>
+                                                    <TextBlock Text="{Binding Label}"
+                                                               FontWeight="SemiBold"
+                                                               MinHeight="28"
+                                                               VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding Path}"
+                                                               Margin="0,2,0,0"
+                                                               Foreground="{DynamicResource Brush.TextSecondary}"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                </StackPanel>
+                                                <StackPanel>
+                                                    <StackPanel.Style>
+                                                        <Style TargetType="StackPanel">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </StackPanel.Style>
+                                                    <TextBox Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"
+                                                             Background="Transparent"
+                                                             BorderThickness="0"
+                                                             Padding="0"
+                                                             FontWeight="SemiBold"
+                                                             MinHeight="28" />
+                                                    <TextBox Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"
+                                                             Style="{x:Null}"
+                                                             Margin="0,2,0,0"
+                                                             Padding="0"
+                                                             BorderThickness="0"
+                                                             Background="Transparent"
+                                                             Foreground="{DynamicResource Brush.TextSecondary}" />
+                                                </StackPanel>
+                                            </Grid>
 
                                             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
                                                 <Border CornerRadius="10" Padding="8,2">
@@ -280,11 +311,35 @@
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Border.Style>
-                                                    <ComboBox Width="96"
-                                                              BorderThickness="0"
-                                                              Background="Transparent"
-                                                              ItemsSource="{Binding DataContext.ItemTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                              SelectedItem="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                    <Grid Width="96">
+                                                        <TextBlock Text="{Binding Type}"
+                                                                   TextAlignment="Center">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                        <ComboBox BorderThickness="0"
+                                                                  Background="Transparent"
+                                                                  ItemsSource="{Binding DataContext.ItemTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                  SelectedItem="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                            <ComboBox.Style>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </ComboBox.Style>
+                                                        </ComboBox>
+                                                    </Grid>
                                                 </Border>
                                             </StackPanel>
 
@@ -298,9 +353,34 @@
                                                 <Button Style="{StaticResource GhostButtonStyle}"
                                                         MinWidth="70"
                                                         Margin="0,0,6,0"
-                                                    Content="{Binding DataContext.Localizer[Edit], RelativeSource={RelativeSource AncestorType=Window}}"
                                                         Command="{Binding DataContext.EditItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                        CommandParameter="{Binding}" />
+                                                        CommandParameter="{Binding}">
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding DataContext.Localizer[Edit], RelativeSource={RelativeSource AncestorType=Window}}">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                        <TextBlock Text="{Binding DataContext.Localizer[Done], RelativeSource={RelativeSource AncestorType=Window}}">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                                            <Setter Property="Visibility" Value="Visible" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Grid>
+                                                </Button>
                                                 <Button Style="{StaticResource DangerButtonStyle}"
                                                         MinWidth="78"
                                                     Content="{Binding DataContext.Localizer[Delete], RelativeSource={RelativeSource AncestorType=Window}}"
@@ -334,26 +414,26 @@
 
                             <TextBox Grid.Column="1"
                                      Margin="0,0,8,0"
-                                     IsEnabled="{Binding HasSelectedItem}"
+                                     IsEnabled="{Binding SelectedItem.IsEditing}"
                                      Text="{Binding SelectedItem.Path, UpdateSourceTrigger=PropertyChanged}" />
 
                             <Button Grid.Column="2"
                                     Style="{StaticResource SecondaryButtonStyle}"
                                     Margin="0,0,8,0"
-                                    IsEnabled="{Binding HasSelectedItem}"
+                                    IsEnabled="{Binding SelectedItem.IsEditing}"
                                     Content="{Binding Localizer[PickAppShort]}"
                                     Command="{Binding PickSelectedItemAsAppCommand}" />
 
                             <Button Grid.Column="3"
                                     Style="{StaticResource SecondaryButtonStyle}"
                                     Margin="0,0,8,0"
-                                    IsEnabled="{Binding HasSelectedItem}"
+                                    IsEnabled="{Binding SelectedItem.IsEditing}"
                                     Content="{Binding Localizer[PickFile]}"
                                     Command="{Binding PickSelectedItemAsFileCommand}" />
 
                             <Button Grid.Column="4"
                                     Style="{StaticResource SecondaryButtonStyle}"
-                                    IsEnabled="{Binding HasSelectedItem}"
+                                    IsEnabled="{Binding SelectedItem.IsEditing}"
                                     Content="{Binding Localizer[PickFolder]}"
                                     Command="{Binding PickSelectedItemAsFolderCommand}" />
                         </Grid>
@@ -378,17 +458,17 @@
 
                             <TextBox Grid.Column="1"
                                      Margin="0,0,8,0"
-                                     IsEnabled="{Binding HasSelectedItem}"
+                                     IsEnabled="{Binding SelectedItem.IsEditing}"
                                      Text="{Binding SelectedItem.OpenWith, UpdateSourceTrigger=PropertyChanged}" />
                             <Button Grid.Column="2"
                                     Style="{StaticResource SecondaryButtonStyle}"
                                     Margin="0,0,8,0"
-                                    IsEnabled="{Binding HasSelectedItem}"
+                                    IsEnabled="{Binding SelectedItem.IsEditing}"
                                     Content="{Binding Localizer[PickApp]}"
                                     Command="{Binding PickOpenWithCommand}" />
                             <Button Grid.Column="3"
                                     Style="{StaticResource GhostButtonStyle}"
-                                    IsEnabled="{Binding HasSelectedItem}"
+                                    IsEnabled="{Binding SelectedItem.IsEditing}"
                                     Content="{Binding Localizer[Clear]}"
                                     Command="{Binding ClearOpenWithCommand}" />
                         </Grid>

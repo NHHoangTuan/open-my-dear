@@ -26,6 +26,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly SemaphoreSlim _saveConfigSemaphore = new(1, 1);
 
     private AppConfigModel _config = new();
+    private LaunchItemViewModel? _editingItem;
     private bool _isInitialized;
     private bool _suspendAutoSave;
 
@@ -198,6 +199,8 @@ public partial class MainWindowViewModel : ObservableObject
 
         SelectedProfile.Items.Add(newItem);
         SelectedItem = newItem;
+        newItem.IsEditing = true;
+        _editingItem = newItem;
         TriggerAutoSave();
     }
 
@@ -217,12 +220,26 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void EditItem(LaunchItemViewModel? item)
     {
-        if (item is null)
+        if (SelectedProfile is null || item is null)
         {
             return;
         }
 
+        if (ReferenceEquals(_editingItem, item))
+        {
+            item.IsEditing = false;
+            _editingItem = null;
+            return;
+        }
+
+        if (_editingItem is not null)
+        {
+            _editingItem.IsEditing = false;
+        }
+
         SelectedItem = item;
+        item.IsEditing = true;
+        _editingItem = item;
     }
 
     [RelayCommand]
@@ -234,6 +251,11 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         SelectedProfile.Items.Remove(item);
+        if (ReferenceEquals(_editingItem, item))
+        {
+            _editingItem = null;
+        }
+
         if (ReferenceEquals(SelectedItem, item))
         {
             SelectedItem = SelectedProfile.Items.FirstOrDefault();
@@ -607,6 +629,12 @@ public partial class MainWindowViewModel : ObservableObject
 
     partial void OnSelectedProfileChanged(ProfileViewModel? value)
     {
+        if (_editingItem is not null)
+        {
+            _editingItem.IsEditing = false;
+            _editingItem = null;
+        }
+
         OnPropertyChanged(nameof(HasSelectedProfile));
         SelectedItem = value?.Items.FirstOrDefault();
         RemoveProfileCommand.NotifyCanExecuteChanged();
@@ -618,6 +646,12 @@ public partial class MainWindowViewModel : ObservableObject
 
     partial void OnSelectedItemChanged(LaunchItemViewModel? value)
     {
+        if (_editingItem is not null && !ReferenceEquals(_editingItem, value))
+        {
+            _editingItem.IsEditing = false;
+            _editingItem = null;
+        }
+
         OnPropertyChanged(nameof(HasSelectedItem));
         RemoveItemCommand.NotifyCanExecuteChanged();
         PickOpenWithCommand.NotifyCanExecuteChanged();
