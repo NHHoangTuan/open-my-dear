@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:helpers="clr-namespace:OpenMyDear.Wpf.Helpers"
         mc:Ignorable="d"
         Title="OpenMyDear.Wpf"
         Topmost="{Binding AlwaysOnTop, Mode=TwoWay}"
@@ -73,12 +74,52 @@
                 <ListBox Grid.Row="2"
                          Margin="0,12,0,12"
                          ItemsSource="{Binding Profiles}"
-                         SelectedItem="{Binding SelectedProfile}">
+                         SelectedItem="{Binding SelectedProfile}"
+                         Padding="0,0,8,0"
+                         ScrollViewer.CanContentScroll="False"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         helpers:SmoothScrollBehavior.IsEnabled="True">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Margin" Value="0,0,0,8" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <ContentPresenter Content="{TemplateBinding Content}"
+                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                          ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                                          ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Border Padding="12"
-                                    CornerRadius="10"
-                                    Background="{DynamicResource Brush.SurfaceAlt}">
+                                    CornerRadius="10">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border}" />
+                                        <Setter Property="BorderThickness" Value="1" />
+                                        <Setter Property="Background" Value="{DynamicResource Brush.SurfaceAlt}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                                <Setter Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+                                                <Setter Property="BorderThickness" Value="1" />
+                                                <Setter Property="Background" Value="{DynamicResource Brush.ListItemSelected}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="26" />
@@ -196,8 +237,10 @@
                                  ItemsSource="{Binding SelectedProfile.Items}"
                                  SelectedItem="{Binding SelectedItem}"
                                  IsEnabled="{Binding HasSelectedProfile}"
+                                 ScrollViewer.CanContentScroll="False"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 helpers:SmoothScrollBehavior.IsEnabled="True"
                                  Margin="0,0,0,10">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">
