@@ -1,4 +1,5 @@
 using System.Windows;
+using OpenMyDear.Wpf.ViewModels;
 
 namespace OpenMyDear.Wpf.Views;
 
@@ -18,5 +19,29 @@ public partial class MainWindow : Window
         };
 
         settingsWindow.ShowDialog();
+    }
+
+    private void OnEditItemClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: LaunchItemViewModel item }
+            || DataContext is not MainWindowViewModel viewModel)
+        {
+            return;
+        }
+
+        viewModel.EditItemCommand.Execute(item);
+
+        var editorWindow = new ItemEditorWindow
+        {
+            Owner = this,
+            DataContext = viewModel
+        };
+
+        editorWindow.ShowDialog();
+
+        if (item.IsEditing)
+        {
+            viewModel.EditItemCommand.Execute(item);
+        }
     }
 }
