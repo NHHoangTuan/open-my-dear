@@ -22,9 +22,9 @@ Dù bạn đang chuyển từ chế độ "Làm việc" sang "Chơi game" hay kh
 
 ## 📸 Ảnh Chụp Màn Hình
 
-| Giao diện chính | Setting |
-| :---: | :---: |
-| ![Giao diện chính](screenshots/main_window.png) | ![Setting](screenshots/setting.png) |
+| Giao diện chính | Setting | Sửa đường dẫn |
+| :---: | :---: |  :---: |
+| ![Giao diện chính](screenshots/main_window.png) | ![Setting](screenshots/setting.png) | ![Sửa đường dẫn](screenshots/edit_item_in_profile.png) |
 
 ---
 

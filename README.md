@@ -22,9 +22,9 @@ Whether you're switching from "Work" to "Gaming" or starting your daily "Develop
 
 ## 📸 Screenshots
 
-| Main Interface | Setting |
-| :---: | :---: |
-| ![Main Window](screenshots/main_window.png) | ![Setting](screenshots/setting.png) |
+| Main Interface | Setting | Edit Path |
+| :---: | :---: | :---: |
+| ![Main Window](screenshots/main_window.png) | ![Setting](screenshots/setting.png) | ![Edit](screenshots/edit_item_in_profile.png) |
 
 ---
 
