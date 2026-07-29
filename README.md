@@ -63,7 +63,7 @@ Download the latest Windows build from the Releases page.
 
 No installation is required for the portable version. Extract the ZIP file and run `OpenMyDear.exe`.
 
-
+[Download Latest Release](https://github.com/NHHoangTuan/open-my-dear/releases/latest)
 
 ---
 
